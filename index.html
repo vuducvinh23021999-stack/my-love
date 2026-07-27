@@ -10,174 +10,250 @@
 <title>Món quà nhỏ</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=Dancing+Script:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-:root{--cream:#FFF8F0;--honey:#E8C07A;--peach:#F5A889;--choco:#5D4037;--dark:#3E2723;--pink:#E8A0B4;--thread:#C0392B}
+:root{--cream:#FFF8F0;--honey:#E8C07A;--peach:#F5A889;--choco:#5D4037;--dark:#3E2723;--pink:#E8A0B4;--thread:#C0392B;--beat:1.2s}
 *{margin:0;padding:0;box-sizing:border-box;outline:none}
-html{-webkit-tap-highlight-color:transparent}
+html{-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
 body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--dark);overflow-x:hidden;min-height:100dvh}
 
-/* LOCK SCREEN */
-.lock{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--cream);transition:opacity .8s ease,visibility .8s;padding:24px}
+/* REDUCED MOTION */
+@media(prefers-reduced-motion){.reduced *,.reduced *::before,.reduced *::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}}
+.rm-toggle{position:fixed;top:12px;right:12px;z-index:2001;width:32px;height:32px;border-radius:50%;border:1px solid rgba(93,64,55,.1);background:rgba(255,248,240,.6);backdrop-filter:blur(8px);font-size:13px;cursor:pointer;color:var(--choco);opacity:.3;transition:opacity .3s;display:none}
+.rm-toggle:hover{opacity:.6}
+body.unlocked .rm-toggle{display:flex;align-items:center;justify-content:center}
+
+/* ===== SCENE 1: HEARTBEAT INTRO ===== */
+.intro{position:fixed;inset:0;z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--cream);cursor:pointer}
+.intro .heart-beat{width:80px;height:80px;fill:none;stroke:var(--choco);stroke-width:1.5;stroke-linecap:round;opacity:.5;animation:heartPulse var(--beat) ease-in-out 4 forwards}
+@keyframes heartPulse{0%,100%{transform:scale(1);opacity:.5}14%{transform:scale(1.18);opacity:.8}28%{transform:scale(1);opacity:.5}42%{transform:scale(1.12);opacity:.65}56%{transform:scale(1);opacity:.5}}
+.intro .ready-text{font-family:'Dancing Script',cursive;font-size:26px;color:var(--choco);margin-top:36px;opacity:0;transition:opacity .8s ease;transition-delay:.2s;pointer-events:none;text-align:center;line-height:1.5}
+.intro .ready-text.show{opacity:.75}
+.intro .sub-ready{font-family:'Nunito',sans-serif;font-size:12px;color:var(--choco);opacity:0;transition:opacity .8s ease;transition-delay:.6s;margin-top:6px;font-weight:300;letter-spacing:2px;text-transform:uppercase}
+.intro .sub-ready.show{opacity:.25}
+.intro.fade-out{opacity:0;transition:opacity .6s;pointer-events:none}
+
+/* PARTICLES (gold dust) */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:1999;overflow:hidden}
+.particle{position:absolute;width:3px;height:3px;background:var(--honey);border-radius:50%;opacity:0;animation:float linear forwards}
+@keyframes float{0%{opacity:0;transform:translateY(0) translateX(0)}10%{opacity:.4}90%{opacity:.2}100%{opacity:0;transform:translateY(-120vh) translateX(30px)}}
+
+/* ===== LOCK SCREEN ===== */
+.lock{position:fixed;inset:0;z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--cream);transition:opacity .8s ease,visibility .8s;padding:24px;opacity:0;visibility:hidden;pointer-events:none}
+.lock.active{opacity:1;visibility:visible;pointer-events:auto}
 .lock.hide{opacity:0;visibility:hidden;pointer-events:none}
-.lock .heart-svg{width:64px;height:64px;margin-bottom:20px;fill:none;stroke:var(--choco);stroke-width:1.8;stroke-linecap:round;opacity:.6}
-.lock .greet{font-family:'Dancing Script',cursive;font-size:22px;color:var(--choco);text-align:center;max-width:300px;line-height:1.5;margin-bottom:32px;opacity:.75}
-.lock .pass-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:280px}
-.lock .pass-wrap input{width:100%;padding:14px 20px;border:1.5px solid rgba(93,64,55,.15);border-radius:14px;background:white;font-size:16px;font-family:'Nunito',sans-serif;text-align:center;letter-spacing:6px;transition:border .3s;color:var(--dark)}
+.lock .heart-svg{width:48px;height:48px;margin-bottom:16px;fill:none;stroke:var(--choco);stroke-width:1.5;stroke-linecap:round;opacity:.3;animation:breathe var(--beat) ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.08);opacity:.45}}
+.lock .greet{font-family:'Dancing Script',cursive;font-size:20px;color:var(--choco);text-align:center;max-width:280px;line-height:1.5;margin-bottom:28px;opacity:.7}
+.lock .pass-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:260px}
+.lock .pass-wrap input{width:100%;padding:12px 18px;border:1.5px solid rgba(93,64,55,.12);border-radius:12px;background:white;font-size:15px;font-family:'Nunito',sans-serif;text-align:center;letter-spacing:6px;transition:border .3s;color:var(--dark)}
 .lock .pass-wrap input:focus{border-color:var(--honey)}
-.lock .pass-wrap input::placeholder{letter-spacing:0;color:#bbb;font-weight:300}
-.lock .pass-wrap .btn{width:100%;padding:14px;border:none;border-radius:14px;background:var(--choco);color:white;font-size:15px;font-weight:600;font-family:'Nunito',sans-serif;cursor:pointer;transition:background .3s,transform .2s}
+.lock .pass-wrap input::placeholder{letter-spacing:0;color:#ccc;font-weight:300}
+.lock .pass-wrap .btn{width:100%;padding:12px;border:none;border-radius:12px;background:var(--choco);color:white;font-size:14px;font-weight:600;font-family:'Nunito',sans-serif;cursor:pointer;transition:background .3s,transform .2s}
 .lock .pass-wrap .btn:active{transform:scale(.97)}
-.lock .pass-wrap .btn:hover{background:var(--dark)}
 .lock .error{font-size:12px;color:#c0392b;opacity:0;transition:opacity .3s;min-height:18px}
 .lock .error.show{opacity:1}
 
-/* MUSIC */
-.music-btn{position:fixed;bottom:24px;right:24px;z-index:100;width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(93,64,55,.12);background:rgba(255,248,240,.85);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .4s,box-shadow .3s;box-shadow:0 2px 16px rgba(0,0,0,.04);color:var(--choco);font-size:20px}
+/* ===== UNLOCK ENVELOPE DROP ===== */
+.unlock-env{position:fixed;inset:0;z-index:1999;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;visibility:hidden}
+.unlock-env.active{opacity:1;visibility:visible}
+.unlock-env .env-drop{width:180px;height:130px;background:var(--peach);border-radius:8px;position:relative;box-shadow:0 10px 60px rgba(0,0,0,.08);animation:envDrop 1s cubic-bezier(.22,1,.36,1) forwards;transform:translateY(-80vh)}
+@keyframes envDrop{0%{transform:translateY(-80vh)}60%{transform:translateY(20px)}80%{transform:translateY(-10px)}100%{transform:translateY(0)}}
+.unlock-env .env-drop .env-flap{position:absolute;top:-1px;left:0;right:0;height:55%;background:var(--honey);border-radius:8px 8px 0 0;transform-origin:bottom;animation:envOpen .8s ease 1.2s forwards}
+@keyframes envOpen{0%{transform:rotateX(0)}100%{transform:rotateX(180deg)}}
+.unlock-env .env-drop .env-seal{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px;animation:sealFade .5s ease 1.6s forwards;opacity:1}
+@keyframes sealFade{0%{opacity:1}100%{opacity:0}}
+.unlock-env .env-glow{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(232,192,122,.15),transparent 70%);opacity:0;animation:glowIn 1s ease 1.8s forwards}
+@keyframes glowIn{0%{opacity:0;transform:scale(.5)}100%{opacity:1;transform:scale(1)}}
+
+/* ===== MUSIC ===== */
+.music-btn{position:fixed;bottom:24px;right:24px;z-index:100;width:46px;height:46px;border-radius:50%;border:1.5px solid rgba(93,64,55,.1);background:rgba(255,248,240,.8);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .4s,box-shadow .3s,opacity .5s;box-shadow:0 2px 16px rgba(0,0,0,.03);color:var(--choco);font-size:18px;opacity:0;pointer-events:none}
+.music-btn.show{opacity:1;pointer-events:auto}
 .music-btn:active{transform:scale(.92)}
-.music-btn.playing{box-shadow:0 0 24px rgba(232,192,122,.15)}
+.music-btn.playing{box-shadow:0 0 24px rgba(232,192,122,.1)}
 .music-btn .disc{transition:transform .8s linear}
 .music-btn.playing .disc{animation:spin 3s linear infinite}
 @keyframes spin{100%{transform:rotate(360deg)}}
 #yt-box{position:absolute;width:0;height:0;opacity:0;pointer-events:none}
 
-/* MAIN */
-.main{display:none;padding-bottom:80px}
+/* ===== MAIN ===== */
+.main{display:none;padding-bottom:80px;position:relative;z-index:1}
 .main.show{display:block}
 
-/* RED THREAD SVG */
-#thread-svg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
-#thread-svg path{fill:none;stroke:var(--thread);stroke-width:1.5;stroke-linecap:round;opacity:.2}
+/* ===== RED THREAD SVG ===== */
+#thread-svg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.25}
+#thread-svg path{fill:none;stroke:var(--thread);stroke-width:1.5;stroke-linecap:round}
 
-/* HERO */
+/* ===== HERO ===== */
 .hero{position:relative;width:100%;height:100dvh;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--cream)}
-.hero .hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;filter:saturate(0) brightness(1.8) blur(6px);transition:opacity 2s ease,filter 3s ease,transform 4s ease;will-change:opacity,filter,transform}
-.hero .hero-bg.show{opacity:1;filter:saturate(1) brightness(1) blur(0);transform:scale(1)}
-.hero .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(255,248,240,.6) 0,transparent 50%,rgba(255,248,240,.1) 100%);z-index:1}
-.hero .hero-content{position:relative;z-index:2;text-align:center;padding:24px;max-width:420px}
-.hero .hero-content .hero-img-wrap{width:200px;height:200px;border-radius:50%;margin:0 auto 24px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.08);opacity:0;transform:scale(.8);transition:opacity 1.5s ease 1s,transform 1.5s ease 1s;border:3px solid rgba(255,248,240,.6)}
+.hero .film-overlay{position:absolute;inset:0;z-index:3;background:white;pointer-events:none;animation:filmReveal 2.8s ease forwards}
+@keyframes filmReveal{0%{opacity:.95;filter:brightness(2.2) saturate(0)}25%{opacity:.7;filter:brightness(1.6) saturate(.2)}50%{opacity:.3;filter:brightness(1.2) saturate(.6)}75%{opacity:.1;filter:brightness(1.05) saturate(.9)}100%{opacity:0;filter:brightness(1) saturate(1)}}
+.film-grain{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:256px 256px;mix-blend-mode:overlay;animation:grainFade 2.5s ease forwards}
+@keyframes grainFade{0%{opacity:.15}60%{opacity:.08}100%{opacity:0}}
+.hero .hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;filter:blur(8px);transition:opacity 2s ease,filter 3s ease;z-index:1}
+.hero .hero-bg.show{opacity:1;filter:blur(0)}
+.hero .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(255,248,240,.5) 0,transparent 50%,rgba(255,248,240,.08) 100%);z-index:4}
+.hero .hero-content{position:relative;z-index:5;text-align:center;padding:20px;max-width:380px}
+.hero .hero-content .hero-img-wrap{width:180px;height:180px;border-radius:50%;margin:0 auto 20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.06);opacity:0;transform:scale(.8);transition:opacity 1.5s ease 2.6s,transform 1.5s ease 2.6s;border:3px solid rgba(255,248,240,.5);position:relative;z-index:6}
 .hero .hero-content .hero-img-wrap.show{opacity:1;transform:scale(1)}
-.hero .hero-content .hero-img-wrap img{width:100%;height:100%;object-fit:cover}
-.hero .hero-content .hero-date{font-family:'Dancing Script',cursive;font-size:28px;color:var(--choco);opacity:0;transform:translateY(20px);transition:opacity 1.2s ease 1.6s,transform 1.2s ease 1.6s}
+.hero .hero-content .hero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.hero .hero-content .hero-date{font-family:'Dancing Script',cursive;font-size:26px;color:var(--choco);opacity:0;transform:translateY(20px);transition:opacity 1.2s ease 3s,transform 1.2s ease 3s}
 .hero .hero-content .hero-date.show{opacity:1;transform:translateY(0)}
-.hero .hero-content .hero-sub{font-size:15px;color:var(--choco);opacity:0;margin-top:8px;font-weight:300;transition:opacity 1.2s ease 2s;font-family:'Dancing Script',cursive;font-size:18px}
-.hero .hero-content .hero-sub.show{opacity:.65}
-.hero .counter{position:absolute;bottom:60px;left:0;right:0;z-index:2;text-align:center;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:0 24px}
-.hero .counter .unit{font-size:12px;color:var(--choco);opacity:.4;font-weight:300;letter-spacing:1px;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:2px}
-.hero .counter .unit .num{font-size:28px;font-weight:400;color:var(--choco);opacity:.7;font-family:'Playfair Display',serif}
-.hero .counter .separator{font-size:20px;color:var(--choco);opacity:.15;font-weight:300}
-.hero .counter .tail{width:100%;margin-top:4px;font-size:11px;color:var(--choco);opacity:.3;font-style:italic}
+.hero .hero-content .hero-sub{font-family:'Dancing Script',cursive;font-size:17px;color:var(--choco);opacity:0;margin-top:6px;transition:opacity 1.2s ease 3.4s}
+.hero .hero-content .hero-sub.show{opacity:.6}
+.hero .counter-wrap{position:absolute;bottom:50px;left:0;right:0;z-index:5;text-align:center}
+.hero .counter{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:0 20px;cursor:pointer}
+.hero .counter .unit{font-size:11px;color:var(--choco);opacity:.4;font-weight:300;letter-spacing:1px;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:1px}
+.hero .counter .unit .num{font-size:24px;font-weight:400;color:var(--choco);opacity:.65;font-family:'Playfair Display',serif;min-width:30px}
+.hero .counter .sep{font-size:18px;color:var(--choco);opacity:.12;font-weight:300}
+.hero .counter .tail{width:100%;margin-top:2px;font-size:10px;color:var(--choco);opacity:.25;font-style:italic}
+.hero .counter-hint{font-size:9px;color:var(--choco);opacity:0;margin-top:4px;letter-spacing:1px;transition:opacity .5s}
+.hero .counter-hint.show{opacity:.15}
+.scroll-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:5;opacity:0;animation:scrollBounce 2s ease infinite;transition:opacity .5s}
+.scroll-hint.show{opacity:.15}
+@keyframes scrollBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(5px)}}
+.scroll-hint svg{width:18px;height:18px;stroke:var(--choco);fill:none;stroke-width:1.5}
 
-/* SCROLL INDICATOR */
-.scroll-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:2;opacity:.2;animation:bounce 2s ease infinite}
-@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
-.scroll-hint svg{width:20px;height:20px;stroke:var(--choco);fill:none;stroke-width:1.5}
+/* ===== ALBUM ===== */
+.album{position:relative;z-index:1;max-width:620px;margin:0 auto;padding:30px 16px}
 
-/* ALBUM */
-.album{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:40px 20px}
-
-/* ENTRY COMMON */
-.entry{position:relative;margin-bottom:60px;opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
+.entry{position:relative;margin-bottom:50px;opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
 .entry.show{opacity:1;transform:translateY(0)}
 
-/* DOUBLE */
-.entry-double{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.entry-double .img-wrap{position:relative;overflow:hidden;border-radius:16px;aspect-ratio:3/4;background:var(--honey)}
-.entry-double .img-wrap img,.entry-full .img-wrap img,.entry-polaroid .img-wrap img,.entry-hero-img img{width:100%;height:100%;object-fit:cover;display:block}
-.entry-double .img-wrap:nth-child(2){margin-top:30px}
+.entry-double{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.entry-double .img-wrap{overflow:hidden;border-radius:14px;aspect-ratio:3/4;background:var(--honey)}
+.entry-double .img-wrap img,.entry-full .img-wrap img,.entry-polaroid .polaroid-card .img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.entry-double .img-wrap:nth-child(2){margin-top:24px}
 
-/* POLAROID */
 .entry-polaroid{display:flex;flex-direction:column;align-items:center}
-.entry-polaroid .polaroid-card{background:white;padding:10px 10px 40px;border-radius:4px;box-shadow:0 4px 24px rgba(0,0,0,.06);max-width:340px;width:100%;transform:rotate(-1.5deg);transition:transform .5s}
-.entry-polaroid .polaroid-card:nth-child(even){transform:rotate(1.5deg)}
-.entry-polaroid .polaroid-card .img-wrap{aspect-ratio:1;overflow:hidden;border-radius:2px;background:var(--peach)}
-.entry-polaroid .polaroid-card img{width:100%;height:100%;object-fit:cover;display:block}
+.entry-polaroid .polaroid-card{background:white;padding:8px 8px 36px;border-radius:3px;box-shadow:0 4px 20px rgba(0,0,0,.05);max-width:300px;width:100%;transform:rotate(-1.8deg);transition:transform .5s cubic-bezier(.22,1,.36,1),box-shadow .5s;cursor:pointer;position:relative}
+.entry-polaroid .polaroid-card:nth-child(even){transform:rotate(1.8deg)}
+.entry-polaroid .polaroid-card .img-wrap{aspect-ratio:1;overflow:hidden;border-radius:1px;background:var(--peach)}
+.entry-polaroid .polaroid-card .polaroid-caption{position:absolute;bottom:8px;left:12px;right:12px;font-family:'Dancing Script',cursive;font-size:13px;color:var(--choco);opacity:.5;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry-polaroid .polaroid-card.expanded{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(0deg) scale(1);z-index:100;max-width:70vw;max-height:80vh;width:auto;box-shadow:0 20px 80px rgba(0,0,0,.2);padding:14px 14px 50px}
+.entry-polaroid .polaroid-card.expanded .img-wrap{aspect-ratio:auto;max-height:65vh}
+.entry-polaroid .polaroid-card.expanded .img-wrap img{max-height:65vh;width:auto;margin:0 auto}
+.entry-polaroid .polaroid-card.expanded .polaroid-caption{font-size:16px;bottom:14px;white-space:normal}
+.polaroid-overlay{position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.35);backdrop-filter:blur(12px);opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s}
+.polaroid-overlay.active{opacity:1;visibility:visible}
 
-/* FULL */
-.entry-full .img-wrap{width:100%;border-radius:18px;overflow:hidden;aspect-ratio:4/3;background:var(--honey)}
+.entry-full .img-wrap{width:100%;border-radius:16px;overflow:hidden;aspect-ratio:4/3;background:var(--honey)}
 
-/* CAPTION */
-.caption{font-size:14px;color:var(--choco);font-weight:300;margin-top:12px;opacity:.55;font-style:italic;text-align:center;line-height:1.5}
-.caption.left{text-align:left}
-.caption.right{text-align:right}
+.caption{font-size:13px;color:var(--choco);font-weight:300;margin-top:10px;opacity:.5;font-style:italic;text-align:center;line-height:1.5;padding:0 4px}
 
-/* LETTER */
-.letter-section{position:relative;z-index:1;max-width:480px;margin:40px auto 0;padding:0 20px 60px}
+/* ===== LETTER SECTION ===== */
+.letter-section{position:relative;z-index:1;max-width:460px;margin:30px auto 0;padding:0 16px 50px}
 .envelope-wrap{display:flex;flex-direction:column;align-items:center;cursor:pointer}
-.envelope{position:relative;width:160px;height:120px;background:var(--honey);border-radius:8px;transition:transform .5s;box-shadow:0 8px 30px rgba(0,0,0,.06)}
-.envelope::before{content:'';position:absolute;top:-1px;left:0;right:0;height:50%;background:var(--peach);border-radius:8px 8px 0 0;transform-origin:bottom;transition:transform .5s ease;z-index:2}
+.envelope{position:relative;width:150px;height:110px;background:var(--honey);border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.04);transition:transform .5s}
+.envelope::before{content:'';position:absolute;top:-1px;left:0;right:0;height:52%;background:var(--peach);border-radius:6px 6px 0 0;transform-origin:bottom;transition:transform .6s cubic-bezier(.22,1,.36,1);z-index:2;clip-path:polygon(0 0,100% 0,100% 100%,50% 70%,0 100%)}
 .envelope.open::before{transform:rotateX(180deg)}
-.envelope .heart-seal{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;font-size:22px;transition:opacity .4s}
-.envelope.open .heart-seal{opacity:0}
-.envelope .flap-inside{position:absolute;top:0;left:0;right:0;height:50%;background:var(--honey);border-radius:8px 8px 0 0;z-index:1;opacity:0;transition:opacity .4s}
-.envelope.open .flap-inside{opacity:1}
-.envelope .letter-preview{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70%;height:50%;background:white;border-radius:4px;z-index:0;opacity:0;transition:all .5s ease;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-.envelope.open .letter-preview{opacity:1;top:30%;transform:translate(-50%,0)}
-.envelope-tap{font-size:12px;color:var(--choco);opacity:.3;margin-top:12px;transition:opacity .3s}
-.envelope-wrap:hover .envelope-tap{opacity:.5}
-.letter-text{max-width:440px;margin:0 auto;opacity:0;transform:translateY(16px);max-height:0;overflow:hidden;transition:opacity 1s ease .3s,transform 1s ease .3s,max-height 1.2s ease .3s}
-.letter-text.open{opacity:1;transform:translateY(0);max-height:800px}
-.letter-text .content{font-family:'Playfair Display',serif;font-size:16px;line-height:1.9;color:var(--choco);font-weight:400;padding:24px 0 0;white-space:pre-line}
-.letter-text .content .sign{font-family:'Dancing Script',cursive;font-size:20px;margin-top:20px;opacity:.7}
+.envelope .seal{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;font-size:18px;transition:opacity .4s}
+.envelope.open .seal{opacity:0}
+.envelope .letter-peek{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:65%;height:45%;background:white;border-radius:3px;z-index:0;opacity:0;transition:all .5s ease;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+.envelope.open .letter-peek{opacity:1;top:28%;transform:translate(-50%,0)}
 
-/* QR */
-.qr-foot{text-align:center;padding:0 20px 40px;opacity:.35;transition:opacity .3s;max-width:400px;margin:0 auto}
-.qr-foot:hover{opacity:.55}
-.qr-foot img{width:70px;height:70px;border-radius:8px;border:1px solid rgba(93,64,55,.06);margin-bottom:6px}
-.qr-foot .qr-label{font-size:9px;color:var(--choco);font-weight:300;letter-spacing:2px;text-transform:uppercase}
+/* TORN EDGE on envelope */
+.envelope.torn::after{content:'';position:absolute;top:-1px;left:0;right:0;height:52%;background:var(--cream);z-index:4;opacity:0;transition:opacity .4s;pointer-events:none}
+.envelope.torn-open::after{opacity:1}
+.torn-edge{position:absolute;top:-1px;left:0;right:0;height:52%;z-index:5;pointer-events:none;opacity:0;transition:opacity .4s}
+.torn-edge.show{opacity:1}
 
-/* RESPONSIVE */
+.envelope-tap{font-size:11px;color:var(--choco);opacity:.25;margin-top:10px;transition:opacity .3s}
+.envelope-wrap:hover .envelope-tap{opacity:.4}
+
+.letter-text{max-width:420px;margin:0 auto;opacity:0;transform:translateY(12px);max-height:0;overflow:hidden;transition:opacity .8s ease .3s,transform .8s ease .3s,max-height 1s ease .3s}
+.letter-text.open{opacity:1;transform:translateY(0);max-height:900px}
+.letter-text .content{padding:24px 0 0;white-space:pre-line}
+.letter-text .content .line{font-family:'Playfair Display',serif;font-size:15px;line-height:1.9;color:var(--choco);font-weight:400;overflow:hidden;border-right:2px solid transparent;white-space:pre-wrap}
+.letter-text .content .line.typing{border-right-color:var(--choco);animation:blink .8s step-end infinite}
+@keyframes blink{50%{border-color:transparent}}
+.letter-text .content .sign{font-family:'Dancing Script',cursive;font-size:19px;margin-top:18px;opacity:.7}
+.letter-text .content .end-heart{font-size:18px;opacity:0;transition:opacity .5s;display:inline-block;margin-top:8px}
+.letter-text .content .end-heart.show{opacity:.6}
+
+/* ===== SCROLL TOP ===== */
+.scroll-top{position:fixed;bottom:24px;left:24px;z-index:99;width:40px;height:40px;border-radius:50%;border:1px solid rgba(93,64,55,.08);background:rgba(255,248,240,.7);backdrop-filter:blur(8px);color:var(--choco);font-size:16px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .4s,transform .3s;box-shadow:0 2px 12px rgba(0,0,0,.03);display:flex;align-items:center;justify-content:center}
+.scroll-top.show{opacity:1;pointer-events:auto}
+.scroll-top:active{transform:scale(.92)}
+
+/* ===== QR ==== */
+.qr-foot{text-align:center;padding:0 16px 30px;opacity:0;transition:opacity .6s;max-width:360px;margin:0 auto}
+.qr-foot.show{opacity:.3}
+.qr-foot:hover{opacity:.5}
+.qr-foot img{width:60px;height:60px;border-radius:6px;border:1px solid rgba(93,64,55,.05);margin-bottom:4px}
+.qr-foot .qr-label{font-size:8px;color:var(--choco);font-weight:300;letter-spacing:1.5px;text-transform:uppercase}
+
+/* ===== RESPONSIVE ===== */
 @media(max-width:480px){
-.lock .greet{font-size:19px}
-.hero .hero-content .hero-img-wrap{width:160px;height:160px}
-.hero .hero-content .hero-date{font-size:22px}
-.hero .counter .unit .num{font-size:22px}
-.hero .counter .unit{font-size:10px}
-.album{padding:24px 16px}
-.entry-double{gap:8px}
-.entry-double .img-wrap{border-radius:12px}
-.entry-full .img-wrap{border-radius:14px}
-.entry-polaroid .polaroid-card{max-width:280px;padding:8px 8px 32px}
-.envelope{width:130px;height:100px}
-.letter-text .content{font-size:15px}
+.intro .heart-beat{width:64px;height:64px}
+.intro .ready-text{font-size:21px}
+.lock .greet{font-size:18px}
+.hero .hero-content .hero-img-wrap{width:150px;height:150px}
+.hero .hero-content .hero-date{font-size:21px}
+.hero .counter .unit .num{font-size:20px}
+.album{padding:20px 12px}
+.entry-double{gap:6px}
+.entry-double .img-wrap{border-radius:10px}
+.entry-full .img-wrap{border-radius:12px}
+.entry-polaroid .polaroid-card{max-width:260px;padding:6px 6px 30px}
+.entry-polaroid .polaroid-card.expanded{max-width:85vw;padding:10px 10px 40px}
+.envelope{width:130px;height:95px}
+.letter-text .content .line{font-size:14px}
 }
-
-@media(min-width:768px){
-.album{max-width:700px}
-.entry-double .img-wrap{aspect-ratio:4/5}
-}
-
-/* LAZY BLUR */
-.img-wrap img{transition:filter .6s,opacity .6s}
-.img-wrap img.lazy{filter:blur(12px);opacity:.6}
-.img-wrap img:not(.lazy){filter:blur(0);opacity:1}
 </style>
 </head>
 <body>
 
+<button class="rm-toggle" id="rmToggle" aria-label="Giảm chuyển động">&#9898;</button>
+
+<!-- SCENE 1: HEARTBEAT INTRO -->
+<div class="intro" id="intro">
+  <svg class="heart-beat" viewBox="0 0 60 60"><path d="M30 52 C18 40,8 32,8 24 C8 16,14 12,20 12 C25 12,28 16,30 19 C32 16,35 12,40 12 C46 12,52 16,52 24 C52 32,42 40,30 52Z" stroke="currentColor"/></svg>
+  <div class="ready-text" id="readyText">Em sẵn sàng chưa?</div>
+  <div class="sub-ready" id="subReady">chạm để mở</div>
+</div>
+
+<!-- GOLD DUST PARTICLES -->
+<div class="particles" id="particles"></div>
+
 <!-- LOCK SCREEN -->
 <div class="lock" id="lockScreen">
-  <svg class="heart-svg" viewBox="0 0 50 50"><path d="M25 44 C13 32, 3 24, 3 16 C3 8, 10 4, 17 4 C22 4, 25 9, 25 9 C25 9, 28 4, 33 4 C40 4, 47 8, 47 16 C47 24, 37 32, 25 44Z" stroke="currentColor"/></svg>
+  <svg class="heart-svg" viewBox="0 0 50 50"><path d="M25 44 C13 32,3 24,3 16 C3 8,10 4,17 4 C22 4,25 9,25 9 C25 9,28 4,33 4 C40 4,47 8,47 16 C47 24,37 32,25 44Z" stroke="currentColor"/></svg>
   <div class="greet">Có một món quà nhỏ<br>dành riêng cho em.</div>
   <div class="pass-wrap">
-    <input type="password" id="passInput" placeholder="Nhập mật khẩu" maxlength="20" autocomplete="off">
+    <input type="password" id="passInput" placeholder="Mật khẩu" maxlength="20" autocomplete="off">
     <button class="btn" id="passBtn">Mở</button>
     <div class="error" id="passError">Chưa đúng rồi, thử lại nha ❤️</div>
   </div>
 </div>
 
+<!-- UNLOCK ENVELOPE -->
+<div class="unlock-env" id="unlockEnv">
+  <div class="env-drop">
+    <div class="env-flap"></div>
+    <div class="env-seal">❤️</div>
+  </div>
+  <div class="env-glow"></div>
+</div>
+
 <!-- MUSIC -->
-<button class="music-btn" id="musicBtn" aria-label="Bật nhạc">
-  <span class="disc">&#9835;</span>
-</button>
+<button class="music-btn" id="musicBtn" aria-label="Bật nhạc"><span class="disc">&#9835;</span></button>
 <div id="yt-box"></div>
 
 <!-- RED THREAD SVG -->
 <svg id="thread-svg" xmlns="http://www.w3.org/2000/svg"><path id="thread-path"/></svg>
+
+<!-- POLAROID OVERLAY -->
+<div class="polaroid-overlay" id="polaroidOverlay"></div>
+
+<!-- SCROLL TOP -->
+<button class="scroll-top" id="scrollTop">&#8593;</button>
 
 <!-- MAIN -->
 <div class="main" id="mainContent">
 
   <!-- HERO -->
   <section class="hero" id="hero">
+    <div class="film-overlay"></div>
+    <div class="film-grain"></div>
     <div class="hero-bg" id="heroBg"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
@@ -187,15 +263,18 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--dark);o
       <div class="hero-date" id="heroDate">23.07.2023</div>
       <div class="hero-sub" id="heroSub">Ngày tụi mình bắt đầu.</div>
     </div>
-    <div class="counter" id="counter">
-      <div class="unit"><span class="num" id="cYears">0</span>năm</div>
-      <span class="separator">·</span>
-      <div class="unit"><span class="num" id="cDays">0</span>ngày</div>
-      <span class="separator">·</span>
-      <div class="unit"><span class="num" id="cHours">0</span>giờ</div>
-      <span class="tail">và vẫn đang tiếp tục&hellip;</span>
+    <div class="counter-wrap">
+      <div class="counter" id="counter">
+        <div class="unit"><span class="num" id="cYears">0</span>năm</div>
+        <span class="sep">·</span>
+        <div class="unit"><span class="num" id="cDays">0</span>ngày</div>
+        <span class="sep">·</span>
+        <div class="unit"><span class="num" id="cHours">0</span>giờ</div>
+        <span class="tail">và vẫn đang tiếp tục&hellip;</span>
+      </div>
+      <div class="counter-hint" id="counterHint">chạm để xem thời gian thực</div>
     </div>
-    <div class="scroll-hint"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
+    <div class="scroll-hint" id="scrollHint"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
   </section>
 
   <!-- ALBUM -->
@@ -207,25 +286,15 @@ body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--dark);o
   <!-- LETTER -->
   <section class="letter-section" id="letterSection">
     <div class="envelope-wrap" id="envWrap">
+      <svg class="torn-edge" id="tornEdge" width="200" height="60" viewBox="0 0 200 60"><path d="M0 0 L200 0 L200 30 L180 28 L160 32 L140 27 L120 31 L100 26 L80 30 L60 27 L40 31 L20 28 L0 30 Z" fill="var(--cream)" stroke="none"/></svg>
       <div class="envelope" id="envelope">
-        <div class="flap-inside"></div>
-        <div class="heart-seal">❤️</div>
-        <div class="letter-preview"></div>
+        <div class="seal">❤️</div>
+        <div class="letter-peek"></div>
       </div>
       <div class="envelope-tap">Chạm vào đây</div>
     </div>
     <div class="letter-text" id="letterText">
-      <div class="content">
-        Gửi em,
-
-        Từ ngày 23.07.2023 đến giờ, tụi mình đã có rất nhiều tấm hình và cũng có rất nhiều chuyện để nhớ.
-
-        Anh làm trang này không phải vì anh giỏi nói lời lãng mạn, mà vì anh muốn em biết rằng những ngày có em đều rất đáng để anh giữ lại vì em là một trong những người quan trọng nhất trong cuộc đời anh. Anh biết bản thân anh chưa đủ tốt, chưa đủ giỏi nhưng anh hứa sẽ luôn luôn cố gắng để em được hạnh phúc.
-
-        Cảm ơn em vì đã bắt đầu cùng anh, luôn yêu thương, bao dung và vẫn đang ở đây cùng anh.
-
-        <div class="sign">Yêu em,</div>
-      </div>
+      <div class="content" id="letterContent"></div>
     </div>
   </section>
 
@@ -269,6 +338,14 @@ var entries = [
   { layout:'polaroid', image:'https://drive.google.com/thumbnail?id=1_Opof8EpUXL0YW7i0LA6dLLQR7KLKr3-&sz=w600', caption:'Và sẽ còn nhiều hơn nữa.' }
 ]
 
+var LETTER_TEXT = [
+  'Gửi em,',
+  'Từ ngày 23.07.2023 đến giờ, tụi mình đã có rất nhiều tấm hình và cũng có rất nhiều chuyện để nhớ.',
+  'Anh làm trang này không phải vì anh giỏi nói lời lãng mạn, mà vì anh muốn em biết rằng những ngày có em đều rất đáng để anh giữ lại vì em là một trong những người quan trọng nhất trong cuộc đời anh.',
+  'Anh biết bản thân anh chưa đủ tốt, chưa đủ giỏi nhưng anh hứa sẽ luôn luôn cố gắng để em được hạnh phúc.',
+  'Cảm ơn em vì đã bắt đầu cùng anh, luôn yêu thương, bao dung và vẫn đang ở đây cùng anh.'
+]
+
 // ===== SHA-256 =====
 function sha256(str) {
   var buf = new TextEncoder().encode(str)
@@ -277,8 +354,49 @@ function sha256(str) {
   })
 }
 
-// ===== LOCK =====
-var locked = true
+// ===== 1. HEARTBEAT INTRO =====
+function initIntro() {
+  var intro = document.getElementById('intro')
+  var ready = document.getElementById('readyText')
+  var sub = document.getElementById('subReady')
+  var particles = document.getElementById('particles')
+
+  // Gold dust
+  var colors = ['#E8C07A','#F5A889','#E8A0B4','#FFF8F0']
+  for (var i = 0; i < 24; i++) {
+    var p = document.createElement('span')
+    p.className = 'particle'
+    p.style.left = (Math.random() * 100) + '%'
+    p.style.top = (60 + Math.random() * 40) + '%'
+    p.style.width = (2 + Math.random() * 3) + 'px'
+    p.style.height = p.style.width
+    p.style.background = colors[Math.floor(Math.random() * colors.length)]
+    p.style.animationDuration = (6 + Math.random() * 8) + 's'
+    p.style.animationDelay = (Math.random() * 4) + 's'
+    particles.appendChild(p)
+  }
+
+  // After 4 heartbeats (~4.8s), show text
+  setTimeout(function() {
+    ready.classList.add('show')
+    setTimeout(function() { sub.classList.add('show') }, 400)
+  }, 4800)
+
+  // Click to proceed
+  intro.addEventListener('click', function() {
+    intro.classList.add('fade-out')
+    particles.style.transition = 'opacity .6s'
+    particles.style.opacity = '0'
+    setTimeout(function() {
+      intro.style.display = 'none'
+      particles.style.display = 'none'
+      document.getElementById('lockScreen').classList.add('active')
+      document.getElementById('passInput').focus()
+    }, 600)
+  })
+}
+
+// ===== 2. LOCK =====
 document.getElementById('passBtn').addEventListener('click', checkPass)
 document.getElementById('passInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') checkPass()
@@ -288,30 +406,82 @@ function checkPass() {
   var val = document.getElementById('passInput').value.trim()
   if (!val) return
   sha256(val).then(function(h) {
-    if (h === PASS_HASH) {
-      locked = false; document.getElementById('lockScreen').classList.add('hide')
-      document.getElementById('mainContent').classList.add('show')
-      initPage()
-    } else {
+    if (h === PASS_HASH) { unlockSuccess() }
+    else {
       document.getElementById('passError').classList.add('show')
       document.getElementById('passInput').value = ''
     }
   })
 }
 
-// ===== COUNTER =====
-function updateCounter() {
-  var now = new Date()
-  var diff = now - START_DATE
-  var years = Math.floor(diff / 31557600000)
-  var days = Math.floor((diff % 31557600000) / 86400000)
-  var hours = Math.floor((diff % 86400000) / 3600000)
-  document.getElementById('cYears').textContent = years
-  document.getElementById('cDays').textContent = days
-  document.getElementById('cHours').textContent = hours
+// ===== 3. UNLOCK ENVELOPE DROP =====
+function unlockSuccess() {
+  document.getElementById('lockScreen').classList.remove('active')
+  document.getElementById('lockScreen').style.display = 'none'
+  var env = document.getElementById('unlockEnv')
+  env.classList.add('active')
+
+  setTimeout(function() {
+    env.classList.remove('active')
+    env.style.display = 'none'
+    document.getElementById('rmToggle').style.display = 'flex'
+    document.getElementById('mainContent').classList.add('show')
+    document.body.classList.add('unlocked')
+    // Auto-start music after unlock
+    setTimeout(autoStartMusic, 600)
+    initPage()
+  }, 2600)
 }
 
-// ===== HERO =====
+// ===== 4. COUNTER =====
+var counterLive = false
+function initCounter() {
+  var elY = document.getElementById('cYears')
+  var elD = document.getElementById('cDays')
+  var elH = document.getElementById('cHours')
+  var hint = document.getElementById('counterHint')
+  var now = new Date()
+  var diff = now - START_DATE
+  var targetY = Math.floor(diff / 31557600000)
+  var targetD = Math.floor((diff % 31557600000) / 86400000)
+  var targetH = Math.floor((diff % 86400000) / 3600000)
+
+  // Animate from 0
+  var frames = 50, i = 0
+  ;(function countUp() {
+    if (i >= frames) {
+      elY.textContent = targetY
+      elD.textContent = targetD
+      elH.textContent = targetH
+      hint.classList.add('show')
+      return
+    }
+    i++
+    var p = i / frames
+    elY.textContent = Math.floor(targetY * p)
+    elD.textContent = Math.floor(targetD * p)
+    elH.textContent = Math.floor(targetH * p)
+    setTimeout(countUp, 30)
+  })()
+
+  // Tap to go live
+  document.getElementById('counter').addEventListener('click', function() {
+    if (counterLive) return
+    counterLive = true
+    hint.textContent = 'đang chạy thực tế'
+    hint.style.opacity = '.25'
+    updateCounter()
+    setInterval(updateCounter, 1000)
+  })
+}
+function updateCounter() {
+  var diff = new Date() - START_DATE
+  document.getElementById('cYears').textContent = Math.floor(diff / 31557600000)
+  document.getElementById('cDays').textContent = Math.floor((diff % 31557600000) / 86400000)
+  document.getElementById('cHours').textContent = Math.floor((diff % 86400000) / 3600000)
+}
+
+// ===== 5. HERO (film effect) =====
 function initHero() {
   var bg = document.getElementById('heroBg')
   bg.style.backgroundImage = 'url(' + HERO_IMG + ')'
@@ -321,32 +491,35 @@ function initHero() {
     document.getElementById('heroImgWrap').classList.add('show')
     document.getElementById('heroDate').classList.add('show')
     document.getElementById('heroSub').classList.add('show')
+    document.getElementById('scrollHint').classList.add('show')
   }, 200)
 }
 
-// ===== RENDER =====
+// ===== 6. RENDER ALBUM =====
 function renderAlbum() {
   var el = document.getElementById('album')
   entries.forEach(function(e, i) {
-    var html = '<div class="entry" data-idx="' + i + '">'
+    var cls = 'entry'
+    if (i === 0) cls += ' first'
+    var h = '<div class="' + cls + '" data-idx="' + i + '">'
     if (e.layout === 'double') {
-      html += '<div class="entry-double">'
+      h += '<div class="entry-double">'
       e.images.forEach(function(img) {
-        html += '<div class="img-wrap"><img class="lazy" data-src="' + img + '" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22%3E%3Crect fill=%22%23f5e6d0%22 width=%221%22 height=%221%22/%3E%3C/svg%3E" alt=""></div>'
+        h += '<div class="img-wrap"><img class="lazy" data-src="' + img + '" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22%3E%3Crect fill=%22%23f5e6d0%22 width=%221%22 height=%221%22/%3E%3C/svg%3E" alt=""></div>'
       })
-      html += '</div>'
+      h += '</div>'
     } else if (e.layout === 'polaroid') {
-      html += '<div class="entry-polaroid"><div class="polaroid-card"><div class="img-wrap"><img class="lazy" data-src="' + e.image + '" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22%3E%3Crect fill=%22%23f5e6d0%22 width=%221%22 height=%221%22/%3E%3C/svg%3E" alt=""></div></div></div>'
+      h += '<div class="entry-polaroid"><div class="polaroid-card" data-expanded="false"><div class="img-wrap"><img class="lazy" data-src="' + e.image + '" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22%3E%3Crect fill=%22%23f5e6d0%22 width=%221%22 height=%221%22/%3E%3C/svg%3E" alt=""></div><div class="polaroid-caption">' + (e.caption || '') + '</div></div></div>'
     } else if (e.layout === 'full') {
-      html += '<div class="entry-full"><div class="img-wrap"><img class="lazy" data-src="' + e.image + '" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 4 3%22%3E%3Crect fill=%22%23f5e6d0%22 width=%224%22 height=%223%22/%3E%3C/svg%3E" alt=""></div></div>'
+      h += '<div class="entry-full"><div class="img-wrap"><img class="lazy" data-src="' + e.image + '" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 4 3%22%3E%3Crect fill=%22%23f5e6d0%22 width=%224%22 height=%223%22/%3E%3C/svg%3E" alt=""></div></div>'
     }
-    if (e.caption) html += '<div class="caption">' + e.caption + '</div>'
-    html += '</div>'
-    el.insertAdjacentHTML('beforeend', html)
+    if (e.caption && e.layout !== 'polaroid') h += '<div class="caption">' + e.caption + '</div>'
+    h += '</div>'
+    el.insertAdjacentHTML('beforeend', h)
   })
 }
 
-// ===== LAZY LOAD =====
+// ===== 7. LAZY LOAD =====
 function initLazy() {
   var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(e) {
@@ -365,7 +538,7 @@ function initLazy() {
   document.querySelectorAll('img.lazy').forEach(function(img) { obs.observe(img) })
 }
 
-// ===== SCROLL REVEAL =====
+// ===== 8. SCROLL REVEAL =====
 function initScrollReveal() {
   var obs = new IntersectionObserver(function(entries) {
     entries.forEach(function(e) {
@@ -374,62 +547,120 @@ function initScrollReveal() {
         obs.unobserve(e.target)
       }
     })
-  }, { threshold:0.1 })
+  }, { threshold:0.08 })
   document.querySelectorAll('.entry').forEach(function(el) { obs.observe(el) })
 }
 
-// ===== RED THREAD =====
-function drawThread() {
-  var path = document.getElementById('thread-path')
-  var pts = []
-  var hero = document.querySelector('.hero')
-  var entries = document.querySelectorAll('.entry')
-  var letter = document.getElementById('letterSection')
-  var winW = window.innerWidth
-
-  if (hero) {
-    var r = hero.getBoundingClientRect()
-    var cx = winW / 2
-    pts.push({ x:cx, y:r.bottom + 20 })
-  }
-  entries.forEach(function(el) {
+// ===== 9. RED THREAD (draw on scroll) =====
+var threadPoints = []
+function buildThread() {
+  var els = document.querySelectorAll('.entry')
+  threadPoints = []
+  els.forEach(function(el) {
     var r = el.getBoundingClientRect()
-    var cx = r.left + r.width / 2
-    var cy = r.top + r.height / 2
-    pts.push({ x:cx, y:cy })
+    var scrollY = window.scrollY || window.pageYOffset
+    var cx = Math.max(30, Math.min(window.innerWidth - 30, r.left + r.width / 2))
+    var cy = r.top + scrollY + r.height / 2
+    threadPoints.push({ x:cx, y:cy })
   })
-  if (letter) {
-    var r2 = letter.querySelector('.envelope-wrap').getBoundingClientRect()
-    pts.push({ x:r2.left + r2.width / 2, y:r2.top + r2.height / 2 })
+  // Add letter endpoint
+  var env = document.getElementById('letterSection')
+  if (env) {
+    var er = env.querySelector('.envelope-wrap').getBoundingClientRect()
+    var ey = er.top + (window.scrollY || window.pageYOffset) + er.height / 2
+    var ex = er.left + er.width / 2
+    threadPoints.push({ x:ex, y:ey })
+  }
+}
+
+function drawThread() {
+  if (threadPoints.length < 2) return
+  var path = document.getElementById('thread-path')
+  var scrollY = window.scrollY || window.pageYOffset
+  var winH = window.innerHeight
+
+  // Calculate visible portion
+  var visibleStart = scrollY
+  var visibleEnd = scrollY + winH
+
+  var pts = []
+  threadPoints.forEach(function(p) {
+    var vp = { x:p.x, y:p.y - scrollY }
+    pts.push(vp)
+  })
+
+  // Only show points in or near viewport
+  var totalLen = 0
+  var segs = []
+  for (var i = 1; i < pts.length; i++) {
+    var dx = pts[i].x - pts[i-1].x
+    var dy = pts[i].y - pts[i-1].y
+    var segLen = Math.sqrt(dx*dx + dy*dy)
+    segs.push(segLen)
+    totalLen += segLen
   }
 
-  if (pts.length < 2) return
+  // Build full path
   var d = 'M ' + pts[0].x + ' ' + pts[0].y
   for (var i = 1; i < pts.length; i++) {
-    var prev = pts[i - 1], cur = pts[i]
-    var cpx1 = prev.x + (cur.x - prev.x) * 0.4
-    var cpy1 = prev.y + (cur.y - prev.y) * 0.3
-    var cpx2 = prev.x + (cur.x - prev.x) * 0.6
-    var cpy2 = prev.y + (cur.y - prev.y) * 0.7
+    var prev = pts[i-1], cur = pts[i]
+    var cpx1 = prev.x + (cur.x - prev.x) * 0.3
+    var cpy1 = prev.y + (cur.y - prev.y) * 0.2
+    var cpx2 = prev.x + (cur.x - prev.x) * 0.7
+    var cpy2 = prev.y + (cur.y - prev.y) * 0.8
     d += ' C ' + cpx1 + ' ' + cpy1 + ', ' + cpx2 + ' ' + cpy2 + ', ' + cur.x + ' ' + cur.y
   }
   path.setAttribute('d', d)
+
+  // Calculate scroll progress for thread draw
+  var firstY = threadPoints[0] ? threadPoints[0].y : 0
+  var lastY = threadPoints[threadPoints.length - 1] ? threadPoints[threadPoints.length - 1].y : document.body.scrollHeight
+  var totalScroll = lastY - firstY - winH * 0.3
+  var scrolled = scrollY - firstY + winH * 0.2
+  var progress = Math.max(0, Math.min(1, scrolled / totalScroll))
+
+  path.style.strokeDasharray = totalLen
+  path.style.strokeDashoffset = totalLen * (1 - progress)
 }
 
-// ===== ENVELOPE =====
-function initEnvelope() {
-  var wrap = document.getElementById('envWrap')
-  var env = document.getElementById('envelope')
-  var text = document.getElementById('letterText')
-  wrap.addEventListener('click', function() {
-    var isOpen = env.classList.toggle('open')
-    text.classList.toggle('open')
+function initThread() {
+  buildThread()
+  drawThread()
+  window.addEventListener('scroll', drawThread)
+  window.addEventListener('resize', function() { buildThread(); drawThread() })
+}
+
+// ===== 10. POLAROID TAP =====
+function initPolaroid() {
+  var overlay = document.getElementById('polaroidOverlay')
+  overlay.addEventListener('click', closePolaroid)
+
+  document.addEventListener('click', function(e) {
+    var card = e.target.closest('.polaroid-card')
+    if (!card) return
+    var isExpanded = card.classList.toggle('expanded')
+    overlay.classList.toggle('active', isExpanded)
+    document.body.style.overflow = isExpanded ? 'hidden' : ''
+    if (isExpanded) {
+      card.dataset.expanded = 'true'
+    } else {
+      card.dataset.expanded = 'false'
+    }
+    e.stopPropagation()
   })
 }
+function closePolaroid() {
+  document.querySelectorAll('.polaroid-card.expanded').forEach(function(c) {
+    c.classList.remove('expanded')
+    c.dataset.expanded = 'false'
+  })
+  document.getElementById('polaroidOverlay').classList.remove('active')
+  document.body.style.overflow = ''
+}
 
-// ===== MUSIC =====
-var playerReady = false, player = null
-function initMusic() {
+// ===== 11. MUSIC WITH GUITAR NOTE =====
+var playerReady = false, player = null, musicPlaying = false, musicAutoStarted = false
+function initMusicEarly() {
   var tag = document.createElement('script')
   tag.src = 'https://www.youtube.com/iframe_api'
   document.head.appendChild(tag)
@@ -442,51 +673,167 @@ window.onYouTubeIframeAPIReady = function() {
     events:{ onReady:function(){ playerReady = true } }
   })
 }
-var musicPlaying = false
+function autoStartMusic() {
+  if (!playerReady || !player || musicAutoStarted) return
+  musicAutoStarted = true
+  player.playVideo()
+  musicPlaying = true
+  document.getElementById('musicBtn').classList.add('playing','show')
+}
+function initMusicBtn() {
+  setTimeout(function() { if (!musicAutoStarted) document.getElementById('musicBtn').classList.add('show') }, 3200)
+}
+
+function playGuitarNote(freq, duration, vol) {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)()
+    var osc = ctx.createOscillator()
+    var gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(freq, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.99, ctx.currentTime + duration * 0.8)
+    gain.gain.setValueAtTime(vol, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.start()
+    osc.stop(ctx.currentTime + duration)
+  } catch(e) {}
+}
+
 document.getElementById('musicBtn').addEventListener('click', function() {
   if (!playerReady || !player) return
   var btn = this
   if (musicPlaying) {
-    player.pauseVideo()
+    playGuitarNote(440, 0.6, 0.15)
+    setTimeout(function() { player.pauseVideo() }, 200)
     btn.classList.remove('playing')
     musicPlaying = false
   } else {
+    playGuitarNote(523, 0.6, 0.2)
     player.playVideo()
     btn.classList.add('playing')
     musicPlaying = true
   }
 })
 
-// ===== QR =====
+// ===== 12. LETTER TYPEWRITER =====
+function initLetter() {
+  var wrap = document.getElementById('envWrap')
+  var env = document.getElementById('envelope')
+  var text = document.getElementById('letterText')
+  var content = document.getElementById('letterContent')
+  var tornEdge = document.getElementById('tornEdge')
+
+  wrap.addEventListener('click', function() {
+    if (env.classList.contains('open')) return
+    env.classList.add('open', 'torn')
+    setTimeout(function() { tornEdge.classList.add('show') }, 100)
+    setTimeout(function() {
+      text.classList.add('open')
+      typeLetter()
+    }, 600)
+  })
+}
+
+function typeLetter() {
+  var content = document.getElementById('letterContent')
+  content.innerHTML = ''
+  var totalLines = LETTER_TEXT.length
+  var lineIdx = 0
+
+  function typeLine() {
+    if (lineIdx >= totalLines) {
+      // Add heart at end
+      var heart = document.createElement('div')
+      heart.className = 'end-heart show'
+      heart.textContent = '❤️'
+      content.appendChild(heart)
+
+      // Show scroll-to-top
+      setTimeout(function() {
+        document.getElementById('scrollTop').classList.add('show')
+      }, 800)
+      return
+    }
+
+    var line = document.createElement('div')
+    line.className = 'line typing'
+    if (lineIdx === totalLines - 1) {
+      line.className = 'line typing'
+      var sign = document.createElement('div')
+      sign.className = 'sign'
+      sign.textContent = 'Yêu em,'
+      content.appendChild(sign)
+    }
+    content.appendChild(line)
+
+    var text = LETTER_TEXT[lineIdx]
+    var charIdx = 0
+    ;(function typeChar() {
+      if (charIdx >= text.length) {
+        line.classList.remove('typing')
+        line.className = 'line'
+        lineIdx++
+        setTimeout(typeLine, 400)
+        return
+      }
+      line.textContent += text.charAt(charIdx)
+      charIdx++
+      setTimeout(typeChar, 28 + Math.random() * 18)
+    })()
+  }
+  typeLine()
+}
+
+// ===== 13. SCROLL TOP =====
+function initScrollTop() {
+  document.getElementById('scrollTop').addEventListener('click', function() {
+    window.scrollTo({ top:0, behavior:'smooth' })
+  })
+}
+
+// ===== 14. REDUCED MOTION TOGGLE =====
+function initReducedMotion() {
+  var btn = document.getElementById('rmToggle')
+  btn.addEventListener('click', function() {
+    document.body.classList.toggle('reduced')
+    this.textContent = document.body.classList.contains('reduced') ? '&#9899;' : '&#9898;'
+  })
+}
+
+// ===== 15. QR =====
 function initQR() {
   var url = window.location.href
   var foot = document.getElementById('qrFoot')
-  var qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(url) + '&color=5d4037&bgcolor=fff8f0'
+  var qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(url) + '&color=5d4037&bgcolor=fff8f0'
   foot.innerHTML = '<img src="' + qrSrc + '" alt="QR"><div class="qr-label">' + url.replace(/^https?:\/\//,'') + '</div>'
+  setTimeout(function() { foot.classList.add('show') }, 3500)
 }
 
 // ===== INIT =====
 function initPage() {
   initHero()
+  initCounter()
+  initMusicBtn()
   renderAlbum()
   setTimeout(function() {
     initLazy()
     initScrollReveal()
-    drawThread()
-    updateCounter()
-    setInterval(updateCounter, 60000)
-    setTimeout(drawThread, 1000)
+    initThread()
+    initPolaroid()
+    initLetter()
+    initScrollTop()
+    initReducedMotion()
+    initQR()
   }, 300)
-  initEnvelope()
-  initMusic()
-  initQR()
-  window.addEventListener('resize', function() { setTimeout(drawThread, 200) })
-  // focus input on load
-  document.getElementById('passInput').focus()
 }
 
-// focus lock input
-document.getElementById('passInput').focus()
+// Start on page load
+document.addEventListener('DOMContentLoaded', function() {
+  initIntro()
+  initMusicEarly()
+})
 </script>
 </body>
 </html>
