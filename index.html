@@ -667,36 +667,46 @@ function closePolaroid() {
 }
 
 // ===== 11. MUSIC WITH GUITAR NOTE =====
-var musicPlaying = false, musicStarted = false
+var musicPlaying = false, ytPlayer = null
+
+function loadYT() {
+  if (window.YT && YT.Player) return
+  var tag = document.createElement('script')
+  tag.src = 'https://www.youtube.com/iframe_api'
+  document.head.appendChild(tag)
+}
+window.onYouTubeIframeAPIReady = function(){}
 
 function startMusic() {
-  if (musicStarted) return
-  musicStarted = true
-  var box = document.getElementById('yt-box')
-  var iframe = document.createElement('iframe')
-  iframe.src = 'https://www.youtube.com/embed/' + YT_ID + '?autoplay=1&loop=1&playlist=' + YT_ID + '&controls=0&playsinline=1&enablejsapi=0'
-  iframe.allow = 'autoplay; encrypted-media'
-  iframe.style.cssText = 'position:absolute;width:1px;height:1px;opacity:.01;pointer-events:none'
-  iframe.title = 'yt'
-  box.appendChild(iframe)
-  musicPlaying = true
-  document.getElementById('musicBtn').classList.add('playing','show')
-  window._ytIframe = iframe
+  if (ytPlayer) {
+    ytPlayer.playVideo()
+    musicPlaying = true
+    document.getElementById('musicBtn').classList.add('playing','show')
+    return
+  }
+  if (!window.YT || !YT.Player) { setTimeout(startMusic, 200); return }
+  ytPlayer = new YT.Player('yt-box', {
+    width:0, height:0,
+    videoId:YT_ID,
+    playerVars:{ autoplay:1, controls:0, loop:1, playlist:YT_ID, playsinline:1, mute:1 },
+    events:{
+      onReady:function(){
+        ytPlayer.playVideo()
+        musicPlaying = true
+        document.getElementById('musicBtn').classList.add('playing','show')
+        setTimeout(function(){ try{ ytPlayer.unMute() }catch(e){} }, 600)
+      }
+    }
+  })
 }
 
 function stopMusic() {
-  if (!musicPlaying) return
+  if (!ytPlayer || !musicPlaying) return
   playGuitarNote(440, 0.6, 0.15)
-  var iframe = window._ytIframe
-  if (iframe) {
-    try { iframe.src = '' } catch(e) {}
-    setTimeout(function() { if (iframe.parentNode) iframe.parentNode.removeChild(iframe) }, 300)
-    window._ytIframe = null
-  }
+  setTimeout(function(){ ytPlayer.pauseVideo(); ytPlayer.seekTo(0) }, 200)
   musicPlaying = false
   document.getElementById('musicBtn').classList.remove('playing')
 }
-
 
 function playGuitarNote(freq, duration, vol) {
   try {
@@ -717,20 +727,11 @@ function playGuitarNote(freq, duration, vol) {
 
 document.getElementById('musicBtn').addEventListener('click', function() {
   if (musicPlaying) { stopMusic() }
-  else {
-    playGuitarNote(523, 0.6, 0.2)
-    if (musicStarted) {
-      var iframe = window._ytIframe
-      if (iframe) {
-        iframe.src = 'https://www.youtube.com/embed/' + YT_ID + '?autoplay=1&loop=1&playlist=' + YT_ID + '&controls=0&playsinline=1'
-        musicPlaying = true
-        this.classList.add('playing')
-      }
-    } else {
-      startMusic()
-    }
-  }
+  else { playGuitarNote(523, 0.6, 0.2); startMusic() }
 })
+
+// Preload YT API
+loadYT()
 
 // ===== 12. LETTER TYPEWRITER =====
 function initLetter() {
