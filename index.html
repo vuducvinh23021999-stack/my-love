@@ -13,7 +13,7 @@
 :root{--cream:#FFF8F0;--honey:#E8C07A;--peach:#F5A889;--choco:#5D4037;--dark:#3E2723;--pink:#E8A0B4;--thread:#C0392B;--beat:1.2s}
 *{margin:0;padding:0;box-sizing:border-box;outline:none}
 html{-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
-body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--dark);overflow-x:hidden;min-height:100dvh}
+body{font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--cream);color:#2C1810;overflow-x:hidden;min-height:100dvh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 
 /* REDUCED MOTION */
 @media(prefers-reduced-motion){.reduced *,.reduced *::before,.reduced *::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}}
@@ -392,10 +392,10 @@ function initIntro() {
 
   // Click to proceed + start music
   intro.addEventListener('click', function() {
+    startMusic()
     intro.classList.add('fade-out')
     particles.style.transition = 'opacity .6s'
     particles.style.opacity = '0'
-    tryAutoStart()
     setTimeout(function() {
       intro.style.display = 'none'
       particles.style.display = 'none'
@@ -436,8 +436,6 @@ function unlockSuccess() {
     document.getElementById('rmToggle').style.display = 'flex'
     document.getElementById('mainContent').classList.add('show')
     document.body.classList.add('unlocked')
-    // Auto-start music after unlock
-    setTimeout(autoStartMusic, 600)
     initPage()
   }, 2600)
 }
@@ -668,38 +666,49 @@ function closePolaroid() {
 }
 
 // ===== 11. MUSIC WITH GUITAR NOTE =====
-var playerReady = false, player = null, musicPlaying = false, musicAutoStarted = false
-function initMusicEarly() {
+var musicPlaying = false, musicStarted = false, player = null, ytLoaded = false
+
+function loadYT() {
+  if (ytLoaded) return
+  ytLoaded = true
   var tag = document.createElement('script')
   tag.src = 'https://www.youtube.com/iframe_api'
   document.head.appendChild(tag)
 }
-window.onYouTubeIframeAPIReady = function() {
-  player = new YT.Player('yt-box', {
-    width:0, height:0,
-    videoId:YT_ID,
-    playerVars:{ autoplay:0, controls:0, loop:1, playlist:YT_ID },
-    events:{ onReady:function(){ playerReady = true } }
-  })
+
+function startMusic() {
+  if (musicStarted) return
+  musicStarted = true
+  loadYT()
+  var waitForPlayer = function() {
+    if (typeof YT !== 'undefined' && YT.Player) {
+      if (!player) {
+        player = new YT.Player('yt-box', {
+          width:0, height:0,
+          videoId:YT_ID,
+          playerVars:{ autoplay:1, controls:0, loop:1, playlist:YT_ID, playsinline:1 },
+          events:{ onReady:function(){ player.playVideo(); musicPlaying = true; document.getElementById('musicBtn').classList.add('playing','show') } }
+        })
+      } else {
+        player.playVideo()
+        musicPlaying = true
+        document.getElementById('musicBtn').classList.add('playing','show')
+      }
+    } else {
+      setTimeout(waitForPlayer, 400)
+    }
+  }
+  setTimeout(waitForPlayer, 200)
 }
-function tryAutoStart() {
-  if (musicAutoStarted) return
-  if (playerReady && player) {
-    musicAutoStarted = true
-    player.playVideo()
-    musicPlaying = true
-    document.getElementById('musicBtn').classList.add('playing','show')
-  } else {
-    setTimeout(tryAutoStart, 500)
+function stopMusic() {
+  if (player && musicPlaying) {
+    playGuitarNote(440, 0.6, 0.15)
+    setTimeout(function() { player.pauseVideo() }, 200)
+    musicPlaying = false
+    document.getElementById('musicBtn').classList.remove('playing')
   }
 }
-function autoStartMusic() {
-  if (musicAutoStarted) return
-  tryAutoStart()
-}
-function initMusicBtn() {
-  setTimeout(function() { if (!musicAutoStarted) document.getElementById('musicBtn').classList.add('show') }, 3200)
-}
+
 
 function playGuitarNote(freq, duration, vol) {
   try {
@@ -719,18 +728,11 @@ function playGuitarNote(freq, duration, vol) {
 }
 
 document.getElementById('musicBtn').addEventListener('click', function() {
-  if (!playerReady || !player) return
-  var btn = this
-  if (musicPlaying) {
-    playGuitarNote(440, 0.6, 0.15)
-    setTimeout(function() { player.pauseVideo() }, 200)
-    btn.classList.remove('playing')
-    musicPlaying = false
-  } else {
+  if (musicPlaying) { stopMusic() }
+  else {
     playGuitarNote(523, 0.6, 0.2)
-    player.playVideo()
-    btn.classList.add('playing')
-    musicPlaying = true
+    if (!musicStarted) { startMusic() }
+    else if (player) { player.playVideo(); musicPlaying = true; this.classList.add('playing') }
   }
 })
 
@@ -832,7 +834,6 @@ function initQR() {
 function initPage() {
   initHero()
   initCounter()
-  initMusicBtn()
   renderAlbum()
   setTimeout(function() {
     initLazy()
@@ -849,7 +850,6 @@ function initPage() {
 // Start on page load
 document.addEventListener('DOMContentLoaded', function() {
   initIntro()
-  initMusicEarly()
 })
 </script>
 </body>
