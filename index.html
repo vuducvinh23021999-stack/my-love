@@ -183,20 +183,28 @@ body.unlocked .rm-toggle{display:flex;align-items:center;justify-content:center}
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:480px){
+body{font-weight:400}
 .intro .heart-beat{width:64px;height:64px}
-.intro .ready-text{font-size:21px}
-.lock .greet{font-size:18px}
+.intro .ready-text{font-size:22px;font-weight:600}
+.lock .greet{font-size:19px;font-weight:500;opacity:.85}
+.lock .pass-wrap input{font-size:16px;padding:14px 18px}
+.lock .pass-wrap .btn{font-size:15px;padding:14px}
 .hero .hero-content .hero-img-wrap{width:150px;height:150px}
-.hero .hero-content .hero-date{font-size:21px}
-.hero .counter .unit .num{font-size:20px}
+.hero .hero-content .hero-date{font-size:23px}
+.hero .hero-content .hero-sub{font-size:16px;font-weight:500;opacity:.7}
+.hero .counter .unit .num{font-size:22px;font-weight:600}
+.hero .counter .unit{font-size:12px;font-weight:500}
 .album{padding:20px 12px}
 .entry-double{gap:6px}
 .entry-double .img-wrap{border-radius:10px}
 .entry-full .img-wrap{border-radius:12px}
 .entry-polaroid .polaroid-card{max-width:260px;padding:6px 6px 30px}
 .entry-polaroid .polaroid-card.expanded{max-width:85vw;padding:10px 10px 40px}
+.entry-polaroid .polaroid-card .polaroid-caption{font-size:14px;font-weight:500;opacity:.65}
+.caption{font-size:14px;font-weight:500;opacity:.6}
 .envelope{width:130px;height:95px}
-.letter-text .content .line{font-size:14px}
+.letter-text .content .line{font-size:16px;font-weight:400}
+.letter-text .content .sign{font-size:20px}
 }
 </style>
 </head>
@@ -382,11 +390,12 @@ function initIntro() {
     setTimeout(function() { sub.classList.add('show') }, 400)
   }, 4800)
 
-  // Click to proceed
+  // Click to proceed + start music
   intro.addEventListener('click', function() {
     intro.classList.add('fade-out')
     particles.style.transition = 'opacity .6s'
     particles.style.opacity = '0'
+    tryAutoStart()
     setTimeout(function() {
       intro.style.display = 'none'
       particles.style.display = 'none'
@@ -673,12 +682,20 @@ window.onYouTubeIframeAPIReady = function() {
     events:{ onReady:function(){ playerReady = true } }
   })
 }
+function tryAutoStart() {
+  if (musicAutoStarted) return
+  if (playerReady && player) {
+    musicAutoStarted = true
+    player.playVideo()
+    musicPlaying = true
+    document.getElementById('musicBtn').classList.add('playing','show')
+  } else {
+    setTimeout(tryAutoStart, 500)
+  }
+}
 function autoStartMusic() {
-  if (!playerReady || !player || musicAutoStarted) return
-  musicAutoStarted = true
-  player.playVideo()
-  musicPlaying = true
-  document.getElementById('musicBtn').classList.add('playing','show')
+  if (musicAutoStarted) return
+  tryAutoStart()
 }
 function initMusicBtn() {
   setTimeout(function() { if (!musicAutoStarted) document.getElementById('musicBtn').classList.add('show') }, 3200)
