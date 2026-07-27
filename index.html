@@ -8,12 +8,13 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#fce4ec 0,#fff0f5 30%,#fce4ec 70%,#fff0f5 100%);min-height:100vh;color:#333;overflow-x:hidden}
-.header{text-align:center;padding:60px 20px 40px;position:relative}
-.header::before{content:'❤️';font-size:60px;display:block;margin-bottom:10px}
-.header h1{font-family:'Dancing Script',cursive;font-size:42px;color:#c2185b;margin-bottom:8px}
+.header{text-align:center;padding:40px 20px 30px;position:relative}
+.header h1{font-family:'Dancing Script',cursive;font-size:42px;color:#c2185b;margin-bottom:6px}
 .header p{font-size:15px;color:#888;font-weight:300;letter-spacing:1px}
-.header .qr{display:inline-block;margin-top:16px;padding:8px 18px;background:white;border-radius:20px;box-shadow:0 2px 10px rgba(0,0,0,.08);font-size:12px;color:#c2185b;text-decoration:none}
-.container{max-width:800px;margin:0 auto;padding:20px 20px 80px}
+.header .qr-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:16px}
+.header .qr-wrap img{width:120px;height:120px;border-radius:12px;box-shadow:0 2px 15px rgba(0,0,0,.1)}
+.header .qr-wrap .url-text{font-size:11px;color:#aaa;word-break:break-all;max-width:300px}
+.container{max-width:800px;margin:0 auto;padding:10px 20px 60px}
 .timeline{position:relative;padding:20px 0}
 .timeline::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,transparent,#e91e63,#e91e63,transparent);transform:translateX(-50%);border-radius:3px}
 .entry{display:flex;align-items:flex-start;margin-bottom:50px;position:relative;opacity:0;transform:translateY(30px);transition:all .6s ease}
@@ -30,8 +31,8 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#fce4ec 0,
 .card .img-wrap img{width:100%;display:block;border-radius:12px;transition:transform .5s}
 .card .img-wrap img:hover{transform:scale(1.03)}
 .hearts{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
-.heart{position:absolute;font-size:20px;opacity:.15;animation:floatHeart linear infinite}
-@keyframes floatHeart{0%{transform:translateY(100vh) rotate(0) scale(.5);opacity:0}10%{opacity:.15}90%{opacity:.15}100%{transform:translateY(-10vh) rotate(720deg) scale(1);opacity:0}}
+.heart{position:absolute;font-size:20px;opacity:.12;animation:floatHeart linear infinite}
+@keyframes floatHeart{0%{transform:translateY(100vh) rotate(0) scale(.5);opacity:0}10%{opacity:.12}90%{opacity:.12}100%{transform:translateY(-10vh) rotate(720deg) scale(1);opacity:0}}
 .footer{text-align:center;padding:30px;color:#aaa;font-size:13px;font-style:italic}
 @media(max-width:640px){
 .header h1{font-size:32px}
@@ -50,7 +51,10 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#fce4ec 0,
 <header class="header">
   <h1>Chuyện Tình Yêu</h1>
   <p>Những khoảnh khắc ngọt ngào của tụi mình ❤️</p>
-  <a class="qr" href="#" id="pageUrl">🔗 Chia sẻ trang này</a>
+  <div class="qr-wrap">
+    <img id="qrImg" alt="QR code">
+    <div class="url-text" id="urlDisplay"></div>
+  </div>
 </header>
 
 <div class="container">
@@ -112,10 +116,13 @@ function createHearts() {
   }
 }
 
-document.getElementById('pageUrl').href = window.location.href;
-document.getElementById('pageUrl').textContent = '🔗 ' + window.location.href;
-createHearts();
-render();
+(function init() {
+  var url = window.location.href;
+  document.getElementById('urlDisplay').textContent = url;
+  document.getElementById('qrImg').src = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(url);
+  createHearts();
+  render();
+})();
 </script>
 </body>
 </html>
